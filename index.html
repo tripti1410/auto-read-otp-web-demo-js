@@ -1,0 +1,50 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body style="min-height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+  <p id="error"></p>
+  <p id="otp"></p>
+  <div style="border:1px solid; padding: 5px; 10px; margin: 10px 0;">
+    <form method="post">
+      Enter OTP here:
+      <input type="text" autocomplete="one-time-code" inputmode="numeric" name="one-time-code">
+      <input type="submit" value="Submit">
+    </form>
+   
+  </div>
+  <script>
+    const error =  document.getElementById('error');
+    const otp =  document.getElementById('otp');
+    
+    if ('OTPCredential' in window) {
+      window.addEventListener('DOMContentLoaded', e => {
+        const input = document.querySelector('input[autocomplete="one-time-code"]');
+        if (!input) return;
+        const ac = new AbortController();
+        const form = input.closest('form');
+        if (form) {
+          form.addEventListener('submit', e => {
+            event.preventDefault();
+            ac.abort();
+            alert("Successfilly form submit")
+          });
+        }
+        navigator.credentials.get({
+          otp: { transport:['sms'] },
+          signal: ac.signal
+        }).then(otp => {
+          input.value = otp.code;
+          otp.innerHTML = otp.code
+          if (form) form.submit();
+        }).catch(err => {
+          error.innerHTML = err
+          console.log(err);
+        });
+      });
+    }
+    </script>
+</body>
+</html>
